@@ -1,0 +1,115 @@
+:root {
+  --mukuru-green: #00a651;
+  --mukuru-dark: #003d1f;
+  --bg: #f4f6f5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: #222;
+}
+
+.app { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+header { text-align: center; margin-bottom: 16px; }
+h1 { color: var(--mukuru-green); margin: 0; }
+
+.lang-toggle {
+  display: flex; gap: 8px; justify-content: center; margin: 12px 0;
+}
+.lang-toggle button {
+  padding: 6px 12px; border: 1px solid var(--mukuru-green);
+  background: white; color: var(--mukuru-green);
+  border-radius: 20px; cursor: pointer;
+}
+.lang-toggle button.active { background: var(--mukuru-green); color: white; }
+
+.lowdata-controls {
+  display: flex; gap: 8px; justify-content: center;
+  align-items: center; font-size: 0.85rem; flex-wrap: wrap;
+}
+.queued-badge {
+  background: #ff9800; color: white; padding: 2px 8px;
+  border-radius: 12px; font-size: 0.75rem;
+}
+
+.mode-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.mode-tabs button {
+  flex: 1; padding: 10px; border: none; border-radius: 8px;
+  background: #e0e0e0; cursor: pointer; font-weight: 600;
+}
+.mode-tabs button.active { background: var(--mukuru-green); color: white; }
+
+button {
+  background: var(--mukuru-green); color: white; border: none;
+  padding: 10px 16px; border-radius: 8px; font-weight: 600;
+  cursor: pointer; margin-top: 8px;
+}
+button.secondary { background: #666; }
+
+/* USSD */
+.ussd-screen {
+  background: #000; color: #0f0; font-family: 'Courier New', monospace;
+  padding: 20px; border-radius: 8px; min-height: 340px;
+  font-size: 1rem; display: flex; flex-direction: column;
+}
+.ussd-content { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.ussd-text { white-space: pre-wrap; margin: 0; line-height: 1.5; }
+.ussd-line { margin: 0; }
+.ussd-screen input {
+  background: #111; color: #0f0; border: 1px solid #0f0;
+  padding: 8px; font-family: inherit; border-radius: 4px;
+  font-size: 1rem;
+}
+.ussd-screen button {
+  background: #0f0; color: #000; align-self: flex-start;
+}
+
+/* Fee box */
+.fee-box {
+  background: rgba(0, 255, 0, 0.08);
+  border-left: 4px solid #0f0;
+  padding: 10px; border-radius: 4px;
+  font-size: 0.85rem;
+}
+.fee-box strong { color: #0f0; }
+
+/* WhatsApp */
+.whatsapp {
+  background: #ece5dd; padding: 12px; border-radius: 12px;
+  display: flex; flex-direction: column; min-height: 400px;
+}
+.chat {
+  flex: 1; display: flex; flex-direction: column;
+  gap: 6px; overflow-y: auto; max-height: 420px;
+  padding: 4px;
+}
+.bubble {
+  max-width: 78%; padding: 8px 12px; border-radius: 12px;
+  font-size: 0.9rem; white-space: pre-wrap;
+}
+.bubble.bot { background: white; align-self: flex-start; }
+.bubble.user { background: #dcf8c6; align-self: flex-end; }
+.status-bubble { background: white; padding: 0; }
+
+.quick-replies {
+  display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+}
+.quick-replies button {
+  font-size: 0.8rem; padding: 6px 10px;
+  background: white; color: var(--mukuru-green);
+  border: 1px solid var(--mukuru-green);
+}
+
+.input-row { display: flex; gap: 6px; margin-top: 8px; }
+.input-row input {
+  flex: 1; padding: 10px 14px; border-radius: 20px;
+  border: 1px solid #ccc; font-size: 0.9rem;
+}
+
+/* Status block (shared by USSD + WhatsApp) */
+.status-block { padding: 12px; border-radius: 8px; margin-top: 8px; }
