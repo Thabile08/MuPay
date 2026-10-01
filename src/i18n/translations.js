@@ -17,7 +17,7 @@ export const T = {
     ussdSent: 'Transfer sent! Ref: {ref}\nReceiver will be notified.',
     ussdCancelled: 'Transfer cancelled.',
     // WhatsApp
-    waWelcome: 'Hi! I am Mukuru. Reply:\n1. Send money\n2. Check status',
+    waWelcome: 'Hi! I am MuPay. Reply:\n1. Send money\n2. Check status',
     waAskAmount: 'How much do you want to send (ZAR)?',
     waAskCountry: 'Which country?\n1. Zimbabwe\n2. Malawi\n3. Zambia\n4. Mozambique\n5. Kenya',
     waAskRecipient: 'Recipient phone number?',
