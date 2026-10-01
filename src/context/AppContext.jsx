@@ -13,6 +13,11 @@ export function AppProvider({ children }) {
   const [status, setStatus] = useState(null);
   const [queued, setQueued] = useState(false);
 
+  // ─────────────  CURRENCY  ─────────────
+  const [sendCurrency, setSendCurrency] = useState('ZAR');
+  const [receiveCurrency, setReceiveCurrency] = useState('USD');
+  // ──────────────────────────────────────
+
   // Receiver identity (item 1)
   const [receiverPhone, setReceiverPhone] = useState(null);
   const [receiverVerified, setReceiverVerified] = useState(false);
@@ -74,18 +79,27 @@ export function AppProvider({ children }) {
     transfer, setTransfer,
     status, setStatus,
     queued, setQueued,
+
+    // ─────────────  CURRENCY  ─────────────
+    sendCurrency, setSendCurrency,
+    receiveCurrency, setReceiveCurrency,
+    // ──────────────────────────────────────
+
     // identity
     receiverPhone, setReceiverPhone,
     receiverVerified, setReceiverVerified,
     otp, setOtp,
+
     // choice
     isMukuruAccount, setIsMukuruAccount,
     receiverChoice, setReceiverChoice,
     bankDetails, setBankDetails,
+
     // guards + audit
     collected, setCollected,
     actionLog, setActionLog,
     senderNotifiedAt, setSenderNotifiedAt,
+
     t, LANGS
   };
 

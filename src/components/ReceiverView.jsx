@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useTransfer } from '../hooks/useTransfer';
 import { validateAccount } from '../utils/validation';
+import { formatMoney } from '../utils/currencies';
 import VerifyPhone from './VerifyPhone';
 import SenderReceipt from './SenderReceipt';
 import AlreadyCollected from './AlreadyCollected';
@@ -36,7 +37,7 @@ export default function ReceiverView() {
 
   const hasTransfer = !!transfer;
 
-  // Item 1: must verify before we even show the money
+  // ── Identity gate: must verify before we show the money ──
   if (!receiverVerified) {
     return (
       <div className="receiver-phone">
@@ -52,11 +53,7 @@ export default function ReceiverView() {
     );
   }
 
-  // Item 10: pickup code integrity check would happen here
-  // (verifyRefChecksum(transfer.ref)) — the demo always passes
-  // because generateSecureRef produces valid checksums.
-
-  // Item 3: already collected → locked screen
+  // ── Already collected: locked receipt screen ──
   if (collected || status === 'COLLECTED') {
     return (
       <div className="receiver-phone">
@@ -135,7 +132,12 @@ export default function ReceiverView() {
 
             <div className="pickup">
               <div className="pickup-label">{t('youReceive')}</div>
-              <div className="pickup-amount">R{transfer.receiverGets.toFixed(2)}</div>
+              <div className="pickup-amount">
+                {formatMoney(transfer.receiverGets, transfer.receiveCurrency)}
+              </div>
+              <div className="pickup-sub">
+                {transfer.sendCurrency} {transfer.amount} × {transfer.rate}
+              </div>
             </div>
 
             <div className="pickup">
@@ -172,14 +174,19 @@ export default function ReceiverView() {
           <div className="sms-incoming">
             <div className="sms-header">💵 {t('withdrawCash')}</div>
             <p className="pickup-hint">{t('collectAt')}</p>
+
             <div className="pickup">
               <div className="pickup-label">{t('youReceive')}</div>
-              <div className="pickup-amount">R{transfer.receiverGets.toFixed(2)}</div>
+              <div className="pickup-amount">
+                {formatMoney(transfer.receiverGets, transfer.receiveCurrency)}
+              </div>
             </div>
+
             <div className="pickup">
               <div className="pickup-label">{t('pickupCode')}</div>
               <div className="pickup-code">{transfer.ref}</div>
             </div>
+
             <button className="collect-btn" onClick={handleCashConfirm}>
               {t('confirmWithdraw')}
             </button>
@@ -205,7 +212,9 @@ export default function ReceiverView() {
             <label className="field-label">{t('chooseBank')}</label>
             <select value={bank} onChange={(e) => setBank(e.target.value)}>
               <option value="">—</option>
-              {BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
+              {BANKS.map((b) => (
+                <option key={b} value={b}>{b}</option>
+              ))}
             </select>
 
             <label className="field-label">{t('accountNumber')}</label>
@@ -219,7 +228,9 @@ export default function ReceiverView() {
 
             <div className="pickup">
               <div className="pickup-label">{t('youReceive')}</div>
-              <div className="pickup-amount">R{transfer.receiverGets.toFixed(2)}</div>
+              <div className="pickup-amount">
+                {formatMoney(transfer.receiverGets, transfer.receiveCurrency)}
+              </div>
             </div>
 
             <button
@@ -243,25 +254,32 @@ export default function ReceiverView() {
   );
 }
 
+// ── Receipt sub-component ──
 function ReceiptView({ t, transfer, receiverChoice, bankDetails }) {
   if (!transfer) return null;
+
   return (
     <div className="sms-collected">
       <div className="tick">✓</div>
       <h3>
         {receiverChoice === 'bank' ? t('bankSuccess') : t('withdrawSuccess')}
       </h3>
+
       <div className="receipt">
         <div className="receipt-row">
           <span>{t('amountReceived')}</span>
-          <strong>R{transfer.receiverGets.toFixed(2)}</strong>
+          <strong>
+            {formatMoney(transfer.receiverGets, transfer.receiveCurrency)}
+          </strong>
         </div>
+
         <div className="receipt-row">
           <span>{t('method')}</span>
           <strong>
             {receiverChoice === 'bank' ? t('methodBank') : t('methodCash')}
           </strong>
         </div>
+
         {receiverChoice === 'bank' && bankDetails && (
           <>
             <div className="receipt-row">
@@ -274,11 +292,13 @@ function ReceiptView({ t, transfer, receiverChoice, bankDetails }) {
             </div>
           </>
         )}
+
         <div className="receipt-row">
           <span>{t('refLabel')}</span>
           <strong>{transfer.ref}</strong>
         </div>
       </div>
+
       <p className="small">{t('receipt')}</p>
     </div>
   );

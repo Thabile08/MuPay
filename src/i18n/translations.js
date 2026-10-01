@@ -95,6 +95,22 @@ export const T = {
     // Code integrity (item 10)
     codeTampered: 'Invalid pickup code — please contact support.',
     codeOneTime: 'This code can only be used once.',
+
+        aboutTitle: 'What is MuPay?',
+    aboutBody:
+      'MuPay lets workers send money home in seconds — no app needed. ' +
+      'Send via USSD or WhatsApp, the receiver gets an SMS with a pickup code, ' +
+      'and they choose how to collect: cash at any Mukuru agent, or straight to their bank.',
+    aboutBullet1: '📶 Works on any phone — USSD + WhatsApp',
+    aboutBullet2: '💵 Transparent fees, rate and payout shown up front',
+    aboutBullet3: '🏦 Receiver chooses cash or bank',
+    aboutBullet4: '🌍 English + chiShona today, more languages next',
+    aboutBullet5: '🔌 Queues offline and syncs when signal returns',
+        currencyPair: 'Currency pair',
+    sendCurrency: 'Send currency',
+    receiveCurrency: 'Receive currency',
+    simulatedRate: 'simulated',
+    example: 'Example',
   },
   sn: {
     appName: 'Mukuru',
@@ -174,6 +190,22 @@ export const T = {
 
     codeTampered: 'Kodhi yekutora haina kunaka — batai support.',
     codeOneTime: 'Kodhi iyi inogona kushandiswa kamwe chete.',
+
+        aboutTitle: 'MuPay chii?',
+    aboutBody:
+      'MuPay inobvumira vashandi kutumira mari kumba muma seconds — hapana app inodiwa. ' +
+      'Tumira neUSSD kana WhatsApp, mugamuchiri anowana SMS ine kodhi yekutora, ' +
+      'osarudza maitiro ekutora: mari paMukuru agent, kana kuchinjira kubhanga ravo.',
+    aboutBullet1: '📶 Inoshanda pafoni ipi neipi — USSD + WhatsApp',
+    aboutBullet2: '💵 Muripo, mutengo nekugamuchira zvinoratidzwa pakutanga',
+    aboutBullet3: '🏦 Mugamuchiri anosarudza mari kana bhanga',
+    aboutBullet4: '🌍 Chirungu + chiShona nhasi, mimwe mitauro inotevera',
+    aboutBullet5: '🔌 Inorinda offline uye inosync kana network yadzoka',    currencyPair: 'Mhando yemari',
+    sendCurrency: 'Mari inotumirwa',
+    receiveCurrency: 'Mari inogamuchirwa',
+    simulatedRate: 'yekufungidzira',
+    example: 'Muenzaniso',
+
   }
 
 };
