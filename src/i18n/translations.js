@@ -1,3 +1,7 @@
+export const REVIEW_STATUS = {
+  en: 'approved',
+  sn: 'pending-native-review'   // flip to 'approved' after sign-off
+};
 export const LANGS = [
   { code: 'en', label: 'English' },
   { code: 'sn', label: 'chiShona' }
@@ -44,7 +48,53 @@ export const T = {
     quickSend: 'Send money',
     quickStatus: 'Check status',
     quickYes: 'YES',
-    quickNo: 'NO'
+    quickNo: 'NO',
+
+        // Receiver side
+    senderPanel: 'SENDER — Johannesburg',
+    receiverPanel: 'RECEIVER — Harare',
+    receiverPhone: 'Feature phone · SMS',
+    waitingForMoney: 'Waiting for money…',
+    incomingMoney: 'You have money waiting!',
+    collectAt: 'Collect at any Mukuru agent',
+    pickupCode: 'Pickup code',
+    amountToCollect: 'Amount to collect',
+    markCollected: 'Mark as collected',
+    collectedThanks: 'Collected. Thank you!',
+    sentBy: 'Sent by',
+
+        // Identity (item 1)
+    verifyTitle: 'Verify your phone',
+    verifySubtitle: 'We sent a 6-digit code by SMS',
+    enterOtp: 'Enter the code',
+    otpIncorrect: 'Incorrect code. Try again.',
+    verifyBtn: 'Verify',
+    yourPhone: 'Your phone number',
+    sendCode: 'Send code',
+    demoOtpHint: 'Demo code: {code}',
+
+    // Double-collect (item 3)
+    alreadyCollected: 'Already collected',
+    alreadyCollectedDesc: 'This transfer has been picked up.',
+
+    // Validation (item 4)
+    accountInvalidLength: 'Account number must be {min}–{max} digits',
+    accountInvalidNumeric: 'Account number must be digits only',
+    accountInvalidPrefix: 'EcoCash numbers must start with 07',
+
+    // Offline (item 5)
+    offlineQueued: 'You are offline. Your choice is saved and will sync.',
+    offlineSynced: 'Synced.',
+
+    // Sender notified (item 7)
+    senderNotified: 'Sender notified at {time}',
+
+    // Out-of-order guard (item 6)
+    notReady: 'Money not ready yet',
+
+    // Code integrity (item 10)
+    codeTampered: 'Invalid pickup code — please contact support.',
+    codeOneTime: 'This code can only be used once.',
   },
   sn: {
     appName: 'Mukuru',
@@ -83,6 +133,47 @@ export const T = {
     quickSend: 'Tumira mari',
     quickStatus: 'Tarisa mamiriro',
     quickYes: 'YES',
-    quickNo: 'NO'
+    quickNo: 'NO',
+
+        // Receiver side
+    senderPanel: 'MUTUMI — Johannesburg',
+    receiverPanel: 'MUGAMUCHIRI — Harare',
+    receiverPhone: 'Foni yekare · SMS',
+    waitingForMoney: 'Takamirira mari…',
+    incomingMoney: 'Une mari yakamirira!',
+    collectAt: 'Tora paMukuru agent',
+    pickupCode: 'Kodhi yekutora',
+    amountToCollect: 'Mari yekutora',
+    markCollected: 'Ratidza kuti yatorwa',
+    collectedThanks: 'Yatorwa. Ndatenda!',
+    sentBy: 'Yakatumirwa na',
+
+        // Identity
+    verifyTitle: 'Simbisa nhamba yako',
+    verifySubtitle: 'Takatumira kodhi ye 6-digit neSMS',
+    enterOtp: 'Isa kodhi',
+    otpIncorrect: 'Kodhi haina kunaka. Edza zvakare.',
+    verifyBtn: 'Simbisa',
+    yourPhone: 'Nhamba yako yefoni',
+    sendCode: 'Tumira kodhi',
+    demoOtpHint: 'Kodhi yedemo: {code}',
+
+    alreadyCollected: 'Yatorwa kare',
+    alreadyCollectedDesc: 'Mari iyi yakatotorwa.',
+
+    accountInvalidLength: 'Nhamba yeaccount inofanira kunge ine {min}–{max} manhamba',
+    accountInvalidNumeric: 'Nhamba yeaccount inofanira kunge iine manhamba chete',
+    accountInvalidPrefix: 'Nhamba dzeEcoCash dzinofanira kutanga na 07',
+
+    offlineQueued: 'Hamuna network. Sarudzo yenyu yakachengetwa uye ichaenderera.',
+    offlineSynced: 'Zvaenderera.',
+
+    senderNotified: 'Mutumi aziviswa na {time}',
+
+    notReady: 'Mari haisati yagadzirira',
+
+    codeTampered: 'Kodhi yekutora haina kunaka — batai support.',
+    codeOneTime: 'Kodhi iyi inogona kushandiswa kamwe chete.',
   }
+
 };

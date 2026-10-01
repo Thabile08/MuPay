@@ -112,4 +112,186 @@ button.secondary { background: #666; }
 }
 
 /* Status block (shared by USSD + WhatsApp) */
-.status-block { padding: 12px; border-radius: 8px; margin-top: 8px; }
+.status-block { padding: 12px; border-radius: 8px; margin-top: 8px; }/* ---------- Side-by-side layout ---------- */
+.side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .side-by-side { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.panel-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #555;
+  text-align: center;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+/* ---------- Receiver phone frame ---------- */
+.receiver-phone {
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+  background: #222;
+  border-radius: 24px;
+  padding: 14px 10px 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.phone-notch {
+  width: 60px; height: 6px; border-radius: 3px;
+  background: #000; margin: 0 auto 8px;
+}
+.phone-screen {
+  background: #f7f7f7;
+  border-radius: 14px;
+  padding: 12px;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.phone-statusbar {
+  display: flex; justify-content: space-between;
+  font-size: 0.7rem; color: #666;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+.sms-waiting {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 40px 8px;
+}
+
+.sms-incoming {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sms-header {
+  font-weight: 700;
+  color: var(--mukuru-green);
+  font-size: 0.9rem;
+}
+.pickup {
+  background: #eefaf2;
+  border-left: 3px solid var(--mukuru-green);
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.pickup-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #666;
+  letter-spacing: 0.04em;
+}
+.pickup-amount {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--mukuru-green);
+}
+.pickup-code {
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.pickup-hint {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+}
+.collect-btn {
+  background: var(--mukuru-green);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.sms-collected {
+  text-align: center;
+  padding: 30px 8px;
+  color: var(--mukuru-green);
+}
+.sms-collected .tick {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+.sms-collected .small {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+
+
+/* Verify screen */
+.verify-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 4px;
+  text-align: center;
+}
+.verify-icon { font-size: 2.5rem; }
+.verify-sub { color: #666; font-size: 0.8rem; margin: 0; }
+
+.error-text {
+  color: #c62828;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.demo-hint {
+  font-size: 0.7rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Sender receipt */
+.sender-receipt {
+  background: #eefaf2;
+  border-left: 3px solid var(--mukuru-green);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: #333;
+  text-align: left;
+}
+.sender-receipt .receipt-row {
+  display: flex; gap: 6px; align-items: center;
+  padding: 2px 0;
+}
+
+/* Offline note inside phone */
+.offline-note {
+  background: #fff3e0;
+  color: #b26a00;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+}
