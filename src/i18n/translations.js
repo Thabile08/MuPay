@@ -162,6 +162,10 @@ export const T = {
     phoneDigitsHint: '{n} digits',
     phoneLengthError: 'Enter exactly {n} digits after the country code',
     phoneInvalid: 'Please enter a valid phone number',
+    dialerTitle: 'Dial',
+    dialerPlaceholder: 'Enter code',
+    dialerCall: 'Call',
+    dialerHint: 'Try: {code}',
 
   },
   sn: {
@@ -307,6 +311,10 @@ export const T = {
     phoneDigitsHint: 'manhamba {n}',
     phoneLengthError: 'Isa manhamba {n} mushure mekodhi yenyika',
     phoneInvalid: 'Isa nhamba yefoni inoshanda',
+    dialerTitle: 'Dhaya',
+    dialerPlaceholder: 'Isa kodhi',
+    dialerCall: 'Fona',
+    dialerHint: 'Eda: {code}',
 
   }
 
