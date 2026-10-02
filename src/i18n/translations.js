@@ -166,6 +166,7 @@ export const T = {
     dialerPlaceholder: 'Enter code',
     dialerCall: 'Call',
     dialerHint: 'Try: {code}',
+    receiverUnlockHint: 'Ask the sender for the PIN and withdrawal number — they were sent by WhatsApp or SMS.',
 
   },
   sn: {
@@ -315,6 +316,7 @@ export const T = {
     dialerPlaceholder: 'Isa kodhi',
     dialerCall: 'Fona',
     dialerHint: 'Eda: {code}',
+    receiverUnlockHint: 'Bvunza mutumi PIN ne nhamba yekutora — zvakatumirwa neWhatsApp kana SMS.',
 
   }
 

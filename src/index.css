@@ -726,4 +726,8 @@ button.secondary { background: #666; }
   border-radius: 4px;
   letter-spacing: 0.1em;
 }
+.pickup-hint + .field-label,
+.field-label:first-of-type {
+  margin-top: 8px;
+}
 
