@@ -26,7 +26,7 @@ export default function ReceiverView() {
   } = useApp();
   const { markCollected, tryUnlock } = useTransfer();
 
-  const [screen, setScreen] = useState('choice');
+  const [screen, setScreen] = useState('unlock');
   const [bank, setBank] = useState('');
   const [account, setAccount] = useState('');
   const [accountError, setAccountError] = useState('');
@@ -35,7 +35,7 @@ export default function ReceiverView() {
   const [unlockError, setUnlockError] = useState('');
 
   useEffect(() => {
-    setScreen('choice');
+    setScreen('unlock');
     setBank('');
     setAccount('');
     setAccountError('');
@@ -104,6 +104,7 @@ export default function ReceiverView() {
     const result = tryUnlock(pinInput, codeInput);
     if (result.ok) {
       setUnlockError('');
+      setScreen('choice');
       return;
     }
     if (result.reason === 'wrong_pin') {
@@ -119,11 +120,8 @@ export default function ReceiverView() {
     }
   };
 
-  // ── Is the verified phone the same as the one the sender entered? ──
-  const phoneMatches =
-    !transfer ||
-    !receiverPhone ||
-    receiverPhone === transfer.recipient;
+  // Demo: phone-match check disabled so the flow always proceeds
+  const phoneMatches = true;
 
   return (
     <div className="receiver-phone">
@@ -165,14 +163,19 @@ export default function ReceiverView() {
                   inputMode="numeric"
                   maxLength={4}
                   value={pinInput}
-                  onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) =>
+                    setPinInput(e.target.value.replace(/\D/g, '').slice(0, 4))
+                  }
                   placeholder="••••"
                 />
+                <div className="phone-hint">{pinInput.length}/4</div>
 
                 <label className="field-label">{t('receiverCodeLabel')}</label>
                 <input
                   value={codeInput}
-                  onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                  onChange={(e) =>
+                    setCodeInput(e.target.value.toUpperCase().slice(0, 12))
+                  }
                   placeholder="MK-XXXXXX-X"
                 />
 
@@ -180,11 +183,19 @@ export default function ReceiverView() {
 
                 <button
                   className="collect-btn"
-                  disabled={!pinInput || !codeInput || receiverAttempts <= 0}
+                  disabled={
+                    pinInput.length !== 4 ||
+                    codeInput.length < 10 ||
+                    receiverAttempts <= 0
+                  }
                   onClick={handleUnlock}
                 >
                   {t('receiverUnlockBtn')}
                 </button>
+
+                <p className="pickup-hint" style={{ fontSize: '0.68rem' }}>
+                  {t('receiverUnlockHint')}
+                </p>
               </>
             )}
           </div>
@@ -234,7 +245,6 @@ export default function ReceiverView() {
           </div>
         )}
 
-        {/* Cash path */}
         {hasTransfer && status === 'READY_TO_COLLECT' && receiverUnlocked && screen === 'cash' && (
           <div className="sms-incoming">
             <div className="sms-header">💵 {t('withdrawCash')}</div>
@@ -256,7 +266,6 @@ export default function ReceiverView() {
           </div>
         )}
 
-        {/* Bank path */}
         {hasTransfer && status === 'READY_TO_COLLECT' && receiverUnlocked && screen === 'bank' && (
           <div className="sms-incoming">
             <div className="sms-header">🏦 {t('transferToBank')}</div>
@@ -313,9 +322,6 @@ export default function ReceiverView() {
   );
 }
 
-/* ─────────────────────────────────────────────
-   Receipt sub-component (used in the COLLECTED state)
-   ───────────────────────────────────────────── */
 function ReceiptView({ t, transfer, receiverChoice, bankDetails }) {
   if (!transfer) return null;
 

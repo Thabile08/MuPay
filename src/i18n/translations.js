@@ -170,7 +170,12 @@ export const T = {
     phonePlaceholder: '771234567',
     phoneLengthError: 'Enter exactly {n} digits after the country code',
     phoneInvalid: 'Please enter a valid phone number',
+    phonePlaceholder: '771234567',
+    phoneLengthError: 'Enter exactly {n} digits after the country code',
+    phoneInvalid: 'Please enter a valid phone number',
+    receiverPhoneMismatch: 'This transfer is for a different phone number. Ask the sender to confirm.',
 
+    receiverUnlockHint: 'Ask the sender for the PIN and withdrawal number — they were sent by WhatsApp or SMS.',
   },
   sn: {
     appName: 'MuPay',
@@ -323,6 +328,11 @@ export const T = {
     phonePlaceholder: '771234567',
     phoneLengthError: 'Isa manhamba {n} mushure mekodhi yenyika',
     phoneInvalid: 'Isa nhamba yefoni inoshanda',
+    phonePlaceholder: '771234567',
+    phoneLengthError: 'Isa manhamba {n} mushure mekodhi yenyika',
+    phoneInvalid: 'Isa nhamba yefoni inoshanda',
+    receiverPhoneMismatch: 'Mari iyi ndeimwe nhamba yefoni. Bvunza mutumi kuti asimbise.',
+        receiverUnlockHint: 'Bvunza mutumi PIN ne nhamba yekutora — zvakatumirwa neWhatsApp kana SMS.',
 
   }
 

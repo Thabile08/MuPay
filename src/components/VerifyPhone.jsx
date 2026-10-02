@@ -1,30 +1,48 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { validatePhone, generateOtp } from '../utils/validation';
+import { COUNTRIES, getCountry, normalizePhone } from '../utils/countries';
+import { generateOtp } from '../utils/validation';
 
 export default function VerifyPhone() {
-  const { t, setReceiverPhone, setOtp, otp, setReceiverVerified } = useApp();
-  const [phone, setPhone] = useState('');
+  const { t, setReceiverPhone, setReceiverVerified, setOtp, otp } = useApp();
+
+  const [countryCode, setCountryCode] = useState('ZW');
+  const [digits, setDigits] = useState('');
   const [typed, setTyped] = useState('');
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
 
+  const country = getCountry(countryCode);
+
+  const onDigitsChange = (e) => {
+    const cleaned = e.target.value
+      .replace(/\D/g, '')
+      .replace(/^0+/, '')            // strip leading zeros
+      .slice(-country.digits);       // keep last N digits
+    setDigits(cleaned);
+    setError('');
+  };
+
   const handleSend = () => {
-    const v = validatePhone(phone);
-    if (!v.ok) { setError(t('phoneInvalid')); return; }
+    const parsed = normalizePhone(digits, countryCode);
+    if (!parsed.ok) {
+      setError(
+        parsed.reason === 'length'
+          ? t('phoneLengthError', { n: country.digits })
+          : t('phoneInvalid')
+      );
+      return;
+    }
     const code = generateOtp();
     setOtp(code);
-    setReceiverPhone(v.normalized);
+    setReceiverPhone(parsed.e164);
     setSent(true);
     setError('');
   };
 
   const handleVerify = () => {
-    if (typed === otp) {
-      setReceiverVerified(true);
-    } else {
-      setError(t('otpIncorrect'));
-    }
+    if (typed === otp) setReceiverVerified(true);
+    else setError(t('otpIncorrect'));
   };
 
   return (
@@ -36,12 +54,47 @@ export default function VerifyPhone() {
       {!sent && (
         <>
           <label className="field-label">{t('yourPhone')}</label>
-          <input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="0771234567 or +263771234567"
-          />
-          <button className="collect-btn" onClick={handleSend}>
+
+          <div className="phone-row">
+            <select
+              className="country-select"
+              value={countryCode}
+              onChange={(e) => {
+                setCountryCode(e.target.value);
+                setDigits('');
+                setError('');
+              }}
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.dial}
+                </option>
+              ))}
+            </select>
+
+            <input
+              className="phone-input"
+              value={digits}
+              onChange={onDigitsChange}
+              inputMode="numeric"
+              maxLength={country.digits}
+              placeholder="771234567"
+              autoFocus
+            />
+          </div>
+
+          <div className="phone-hint">
+            {country.flag} {country.name} · {country.dial} ·{' '}
+            {digits.length}/{country.digits} digits
+          </div>
+
+          {error && <div className="error-text">{error}</div>}
+
+          <button
+            className="collect-btn"
+            disabled={digits.length !== country.digits}
+            onClick={handleSend}
+          >
             {t('sendCode')}
           </button>
         </>
@@ -52,19 +105,24 @@ export default function VerifyPhone() {
           <label className="field-label">{t('enterOtp')}</label>
           <input
             value={typed}
-            onChange={(e) => setTyped(e.target.value)}
+            onChange={(e) =>
+              setTyped(e.target.value.replace(/\D/g, '').slice(0, 6))
+            }
             inputMode="numeric"
             maxLength={6}
             placeholder="••••••"
+            autoFocus
           />
           <div className="demo-hint">{t('demoOtpHint', { code: otp })}</div>
-          <button className="collect-btn" onClick={handleVerify}>
+          <button
+            className="collect-btn"
+            disabled={typed.length !== 6}
+            onClick={handleVerify}
+          >
             {t('verifyBtn')}
           </button>
         </>
       )}
-
-      {error && <div className="error-text">{error}</div>}
     </div>
   );
 }
