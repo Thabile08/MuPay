@@ -1,21 +1,27 @@
-# MuPay – Money Home, Made Simple (MVP)
+# MuPay: Money Home, Made Simple
 
-Hackathon MVP for the Mukuru challenge. Demonstrates:
+MuPay is a Mukuru-powered way to send money home from a basic phone.
+Built for Mukuru SheHacks, Challenge A.
 
-- **Bonus A:** Simulated USSD (`*120#`) and WhatsApp money-sending experience
-- **Bonus C:** Low-data and offline-friendly functionality
-- Languages: **English** and **chiShona** (extensible to more)
-- No standalone app UI — everything runs through USSD or WhatsApp
+## What it does (mapped to the brief)
 
-## User story
+| Brief item                         | How MuPay does it                                              |
+| ---------------------------------- | -------------------------------------------------------------- |
+| Send-money journey                 | Sender (Johannesburg) to receiver (Harare) on one screen       |
+| Fee and exchange-rate transparency | Fee, rate and "receiver gets" shown before the sender confirms |
+| Status tracking                    | Sent, In transit, Ready to collect, Collected                  |
+| Two languages                      | English and chiShona (chiShona pending native review)          |
+| Simulated USSD / WhatsApp          | USSD `*120#` simulator and a WhatsApp-style chat bot           |
+| Low-data / offline mode            | Low Data Mode toggle; offline actions are queued and synced    |
+| Notify the receiver                | SMS-style "money waiting" message and receiver screen          |
 
-Thandi works in Johannesburg and sends money home. She can:
+Extras: receiver phone verification (OTP), one-time collect guard, per-bank
+account validation, cash or bank choice, sender receipt, 8-currency picker.
 
-1. Send via **USSD** or **WhatsApp** (shared transfer + shared status tracker)
-2. See fee, rate and receiver amount **before** confirming
-3. Track: SENT → IN TRANSIT → READY TO COLLECT → COLLECTED
-4. Switch between English and chiShona
-5. Queue transfers when offline and auto-sync when signal returns
+## What is simulated
+
+Exchange rates, the OTP (shown on screen), the SMS/USSD/WhatsApp channels and
+the status timers are all simulated in the frontend for the hackathon.
 
 ## Run
 
