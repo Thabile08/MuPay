@@ -167,6 +167,9 @@ export const T = {
     dialerCall: 'Call',
     dialerHint: 'Try: {code}',
     receiverUnlockHint: 'Ask the sender for the PIN and withdrawal number — they were sent by WhatsApp or SMS.',
+    phonePlaceholder: '771234567',
+    phoneLengthError: 'Enter exactly {n} digits after the country code',
+    phoneInvalid: 'Please enter a valid phone number',
 
   },
   sn: {
@@ -317,6 +320,9 @@ export const T = {
     dialerCall: 'Fona',
     dialerHint: 'Eda: {code}',
     receiverUnlockHint: 'Bvunza mutumi PIN ne nhamba yekutora — zvakatumirwa neWhatsApp kana SMS.',
+    phonePlaceholder: '771234567',
+    phoneLengthError: 'Isa manhamba {n} mushure mekodhi yenyika',
+    phoneInvalid: 'Isa nhamba yefoni inoshanda',
 
   }
 
