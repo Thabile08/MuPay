@@ -4,6 +4,7 @@ import { useTransfer } from '../hooks/useTransfer';
 import { getQuote, quoteText } from '../utils/quote';
 import FeeBreakdown from './FeeBreakdown';
 import TransactionStatus from './TransactionStatus';
+import Dialer from './Dialer';
 
 const COUNTRIES = ['ZW', 'MW', 'ZM', 'MZ', 'KE'];
 
@@ -74,12 +75,21 @@ export default function USSDInterface() {
   const render = () => {
     switch (step) {
       case 'dial':
-        return (
-          <div className="ussd-content">
-            <p className="ussd-line">&gt; {t('ussdDial')}</p>
-            <button onClick={() => setStep('menu')}>{t('ussdDial')}</button>
-          </div>
-        );
+  return (
+    <div className="ussd-content">
+      <Dialer
+        target="*120#"
+        onDial={(code) => {
+          // code === '*120#'
+          setStep('menu');
+        }}
+        onCancel={() => {
+          // optional: go back to the previous screen
+          // setStep('done');
+        }}
+      />
+    </div>
+  );
       case 'menu':
         return (
           <div className="ussd-content">

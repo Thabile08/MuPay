@@ -16,28 +16,37 @@ export default function ReceiverView() {
   const {
     t, status, transfer,
     receiverVerified,
+    receiverPhone,
+    receiverUnlocked,
+    receiverAttempts,
     isMukuruAccount, setIsMukuruAccount,
     receiverChoice, bankDetails,
     collected,
     offline
   } = useApp();
-  const { markCollected } = useTransfer();
+  const { markCollected, tryUnlock } = useTransfer();
 
   const [screen, setScreen] = useState('choice');
   const [bank, setBank] = useState('');
   const [account, setAccount] = useState('');
   const [accountError, setAccountError] = useState('');
+  const [pinInput, setPinInput] = useState('');
+  const [codeInput, setCodeInput] = useState('');
+  const [unlockError, setUnlockError] = useState('');
 
   useEffect(() => {
     setScreen('choice');
     setBank('');
     setAccount('');
     setAccountError('');
+    setPinInput('');
+    setCodeInput('');
+    setUnlockError('');
   }, [transfer?.ref]);
 
   const hasTransfer = !!transfer;
 
-  // ── Identity gate: must verify before we show the money ──
+  // ── Identity gate ──
   if (!receiverVerified) {
     return (
       <div className="receiver-phone">
@@ -53,7 +62,7 @@ export default function ReceiverView() {
     );
   }
 
-  // ── Already collected: locked receipt screen ──
+  // ── Collected → locked receipt ──
   if (collected || status === 'COLLECTED') {
     return (
       <div className="receiver-phone">
@@ -82,8 +91,7 @@ export default function ReceiverView() {
       const map = {
         length: t('accountInvalidLength', { min: '6', max: '20' }),
         numeric: t('accountInvalidNumeric'),
-        prefix: t('accountInvalidPrefix'),
-        unknown_bank: t('accountInvalidNumeric')
+        prefix: t('accountInvalidPrefix')
       };
       setAccountError(map[v.reason] || t('accountInvalidNumeric'));
       return;
@@ -92,9 +100,30 @@ export default function ReceiverView() {
     markCollected('bank', { bank, account });
   };
 
-  const handleCashConfirm = () => {
-    markCollected('cash');
+  const handleUnlock = () => {
+    const result = tryUnlock(pinInput, codeInput);
+    if (result.ok) {
+      setUnlockError('');
+      return;
+    }
+    if (result.reason === 'wrong_pin') {
+      setUnlockError(
+        receiverAttempts <= 1
+          ? t('receiverTooManyAttempts')
+          : `${t('receiverPinWrong')} · ${t('receiverAttemptsLeft', { n: result.attemptsLeft })}`
+      );
+    } else if (result.reason === 'wrong_code') {
+      setUnlockError(t('receiverCodeWrong'));
+    } else if (result.reason === 'too_many_attempts') {
+      setUnlockError(t('receiverTooManyAttempts'));
+    }
   };
+
+  // ── Is the verified phone the same as the one the sender entered? ──
+  const phoneMatches =
+    !transfer ||
+    !receiverPhone ||
+    receiverPhone === transfer.recipient;
 
   return (
     <div className="receiver-phone">
@@ -117,11 +146,51 @@ export default function ReceiverView() {
           <div className="sms-waiting">
             <div className="waiting-icon">⏳</div>
             <div>{t('inTransit')}</div>
-            <div className="small">Ref {transfer.ref}</div>
+            <div className="small">Ref {transfer.withdrawalNumber}</div>
           </div>
         )}
 
-        {hasTransfer && status === 'READY_TO_COLLECT' && screen === 'choice' && (
+        {hasTransfer && status === 'READY_TO_COLLECT' && !receiverUnlocked && (
+          <div className="sms-incoming">
+            <div className="sms-header">🔐 {t('receiverUnlockTitle')}</div>
+            <p className="pickup-hint">{t('receiverUnlockDesc')}</p>
+
+            {!phoneMatches ? (
+              <div className="error-text">{t('receiverPhoneMismatch')}</div>
+            ) : (
+              <>
+                <label className="field-label">{t('receiverPinLabel')}</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
+                  placeholder="••••"
+                />
+
+                <label className="field-label">{t('receiverCodeLabel')}</label>
+                <input
+                  value={codeInput}
+                  onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                  placeholder="MK-XXXXXX-X"
+                />
+
+                {unlockError && <div className="error-text">{unlockError}</div>}
+
+                <button
+                  className="collect-btn"
+                  disabled={!pinInput || !codeInput || receiverAttempts <= 0}
+                  onClick={handleUnlock}
+                >
+                  {t('receiverUnlockBtn')}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {hasTransfer && status === 'READY_TO_COLLECT' && receiverUnlocked && screen === 'choice' && (
           <div className="sms-incoming">
             <div className="sms-header">📩 {t('incomingMoney')}</div>
 
@@ -138,11 +207,6 @@ export default function ReceiverView() {
               <div className="pickup-sub">
                 {transfer.sendCurrency} {transfer.amount} × {transfer.rate}
               </div>
-            </div>
-
-            <div className="pickup">
-              <div className="pickup-label">{t('pickupCode')}</div>
-              <div className="pickup-code">{transfer.ref}</div>
             </div>
 
             <div className="choice-title">{t('chooseHowToReceive')}</div>
@@ -170,7 +234,8 @@ export default function ReceiverView() {
           </div>
         )}
 
-        {hasTransfer && status === 'READY_TO_COLLECT' && screen === 'cash' && (
+        {/* Cash path */}
+        {hasTransfer && status === 'READY_TO_COLLECT' && receiverUnlocked && screen === 'cash' && (
           <div className="sms-incoming">
             <div className="sms-header">💵 {t('withdrawCash')}</div>
             <p className="pickup-hint">{t('collectAt')}</p>
@@ -182,12 +247,7 @@ export default function ReceiverView() {
               </div>
             </div>
 
-            <div className="pickup">
-              <div className="pickup-label">{t('pickupCode')}</div>
-              <div className="pickup-code">{transfer.ref}</div>
-            </div>
-
-            <button className="collect-btn" onClick={handleCashConfirm}>
+            <button className="collect-btn" onClick={() => markCollected('cash')}>
               {t('confirmWithdraw')}
             </button>
             <button className="ghost-btn" onClick={() => setScreen('choice')}>
@@ -196,7 +256,8 @@ export default function ReceiverView() {
           </div>
         )}
 
-        {hasTransfer && status === 'READY_TO_COLLECT' && screen === 'bank' && (
+        {/* Bank path */}
+        {hasTransfer && status === 'READY_TO_COLLECT' && receiverUnlocked && screen === 'bank' && (
           <div className="sms-incoming">
             <div className="sms-header">🏦 {t('transferToBank')}</div>
 
@@ -212,9 +273,7 @@ export default function ReceiverView() {
             <label className="field-label">{t('chooseBank')}</label>
             <select value={bank} onChange={(e) => setBank(e.target.value)}>
               <option value="">—</option>
-              {BANKS.map((b) => (
-                <option key={b} value={b}>{b}</option>
-              ))}
+              {BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
             </select>
 
             <label className="field-label">{t('accountNumber')}</label>
@@ -254,7 +313,9 @@ export default function ReceiverView() {
   );
 }
 
-// ── Receipt sub-component ──
+/* ─────────────────────────────────────────────
+   Receipt sub-component (used in the COLLECTED state)
+   ───────────────────────────────────────────── */
 function ReceiptView({ t, transfer, receiverChoice, bankDetails }) {
   if (!transfer) return null;
 
@@ -295,7 +356,7 @@ function ReceiptView({ t, transfer, receiverChoice, bankDetails }) {
 
         <div className="receipt-row">
           <span>{t('refLabel')}</span>
-          <strong>{transfer.ref}</strong>
+          <strong>{transfer.withdrawalNumber}</strong>
         </div>
       </div>
 

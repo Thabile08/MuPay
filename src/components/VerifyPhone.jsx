@@ -11,7 +11,7 @@ export default function VerifyPhone() {
 
   const handleSend = () => {
     const v = validatePhone(phone);
-    if (!v.ok) { setError(t('accountInvalidNumeric')); return; }
+    if (!v.ok) { setError(t('phoneInvalid')); return; }
     const code = generateOtp();
     setOtp(code);
     setReceiverPhone(v.normalized);

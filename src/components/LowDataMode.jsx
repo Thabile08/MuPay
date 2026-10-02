@@ -15,6 +15,8 @@ export default function LowDataMode() {
       <button onClick={() => setOffline(!offline)}>
         {offline ? t('restoreSignal') : t('simulateNoSignal')}
       </button>
+            {lowData && <span className="lowdata-badge">{t('lowDataOn')}</span>}
+
       {queued && <span className="queued-badge">⏳ queued</span>}
     </div>
   );

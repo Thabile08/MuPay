@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { useTransfer } from '../hooks/useTransfer';
 
 export default function SimulateIncoming() {
-  const { t, status, transfer } = useApp();
+  const { t, status, transfer, sendCurrency } = useApp();
   const { createTransfer, reset, advanceStatus } = useTransfer();
 
   const [amount, setAmount] = useState(200);
@@ -11,7 +11,10 @@ export default function SimulateIncoming() {
 
   const hasActiveTransfer = !!transfer;
 
-  // Auto-drive SENT → IN_TRANSIT → READY_TO_COLLECT for the demo
+  // Auto-drive SENT → IN_TRANSIT → READY_TO_COLLECT for the demo.
+  // (advanceStatus stops at READY_TO_COLLECT; only the receiver can finish.)
+  // advanceStatus is deliberately not a dependency: it is a new function on
+  // every render, which would keep restarting these timers.
   useEffect(() => {
     if (!transfer) return;
     if (status === 'SENT') {
@@ -22,12 +25,13 @@ export default function SimulateIncoming() {
       const b = setTimeout(() => advanceStatus(), 1400);
       return () => clearTimeout(b);
     }
-  }, [status, transfer, advanceStatus]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, transfer]);
 
   return (
     <div className="simulate-panel">
-      <div className="simulate-title">{t('simulateIncoming')}</div>
-      <div className="simulate-hint">{t('simulateHint')}</div>
+      <div className="simulate-title">{t('send')}</div>
+      <div className="simulate-hint">{t('hint')}</div>
 
       {!hasActiveTransfer && (
         <>
@@ -38,7 +42,7 @@ export default function SimulateIncoming() {
             onChange={(e) => setSender(e.target.value)}
           />
 
-          <label className="sim-label">{t('amountLabel')} (ZAR)</label>
+          <label className="sim-label">{t('amountLabel')} ({sendCurrency})</label>
           <input
             className="sim-input"
             type="number"
@@ -48,11 +52,13 @@ export default function SimulateIncoming() {
 
           <button
             className="sim-btn"
+            disabled={!(amount > 0)}
             onClick={() =>
               createTransfer({
                 amount,
                 country: 'ZW',
-                recipient: sender
+                recipient: '0770000000',
+                senderName: sender
               })
             }
           >

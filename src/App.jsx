@@ -16,6 +16,8 @@ export default function App() {
       <header>
         <h1>{t('appName')}</h1>
         <p>{t('tagline')}</p>
+                <p className="powered-by">{t('poweredBy')}</p>
+
         <LanguageToggle />
         <LowDataMode />
       </header>
