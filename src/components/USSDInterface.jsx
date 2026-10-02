@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useTransfer } from '../hooks/useTransfer';
+import { getQuote, quoteText } from '../utils/quote';
 import FeeBreakdown from './FeeBreakdown';
 import TransactionStatus from './TransactionStatus';
 
 const COUNTRIES = ['ZW', 'MW', 'ZM', 'MZ', 'KE'];
 
 export default function USSDInterface() {
-  const { t, offline, queued } = useApp();
-  const { transfer, createTransfer } = useTransfer();
+  const { t, queued, sendCurrency, receiveCurrency } = useApp();
+  const { createTransfer } = useTransfer();
 
   const [step, setStep] = useState('dial');
   const [amount, setAmount] = useState('');
   const [country, setCountry] = useState('ZW');
   const [recipient, setRecipient] = useState('');
+  const [quote, setQuote] = useState(null); // locked when the confirm screen opens
   const [input, setInput] = useState('');
 
   const reset = () => {
@@ -21,6 +23,7 @@ export default function USSDInterface() {
     setAmount('');
     setCountry('ZW');
     setRecipient('');
+    setQuote(null);
     setInput('');
   };
 
@@ -32,7 +35,7 @@ export default function USSDInterface() {
   };
 
   const handleAmt = () => {
-    if (!input || isNaN(Number(input))) return;
+    if (!input || isNaN(Number(input)) || Number(input) <= 0) return;
     setAmount(input);
     setInput('');
     setStep('ctry');
@@ -40,7 +43,7 @@ export default function USSDInterface() {
 
   const handleCtry = () => {
     const idx = Number(input) - 1;
-    if (idx < 0 || idx >= COUNTRIES.length) return;
+    if (!Number.isInteger(idx) || idx < 0 || idx >= COUNTRIES.length) return;
     setCountry(COUNTRIES[idx]);
     setInput('');
     setStep('recipient');
@@ -49,15 +52,20 @@ export default function USSDInterface() {
   const handleRecipient = () => {
     if (!input) return;
     setRecipient(input);
+    // Work out the quote ONCE, now. The sender sees it on the confirm screen
+    // and the transfer is created from this exact quote.
+    setQuote(getQuote(Number(amount), sendCurrency, receiveCurrency));
     setInput('');
     setStep('conf');
   };
 
+  // Nothing is created until the sender picks 1 (Confirm).
   const handleConfirm = (val) => {
     if (val === '1') {
-      createTransfer({ amount: Number(amount), country, recipient });
+      createTransfer({ amount: Number(amount), country, recipient, quote });
       setStep('status');
-    } else {
+    } else if (val === '2') {
+      setQuote(null);
       setStep('done');
     }
     setInput('');
@@ -88,7 +96,7 @@ export default function USSDInterface() {
       case 'amt':
         return (
           <div className="ussd-content">
-            <p className="ussd-line">{t('ussdEnterAmount')}</p>
+            <p className="ussd-line">{t('ussdEnterAmount', { currency: sendCurrency })}</p>
             <input value={input} onChange={(e) => setInput(e.target.value)} inputMode="numeric" autoFocus />
             <button onClick={handleAmt}>OK</button>
           </div>
@@ -112,15 +120,8 @@ export default function USSDInterface() {
       case 'conf':
         return (
           <div className="ussd-content">
-            <pre className="ussd-text">
-              {t('ussdConfirm', {
-                amount,
-                fee: transfer?.fee ?? '...',
-                rate: transfer?.rate ?? '...',
-                receiverGets: transfer?.receiverGets?.toFixed(2) ?? '...'
-              })}
-            </pre>
-            <FeeBreakdown amount={Number(amount)} country={country} />
+            <pre className="ussd-text">{t('ussdConfirm', quoteText(quote))}</pre>
+            <FeeBreakdown quote={quote} />
             <input value={input} onChange={(e) => setInput(e.target.value)} maxLength={1} autoFocus />
             <button onClick={() => handleConfirm(input)}>OK</button>
           </div>
@@ -141,6 +142,8 @@ export default function USSDInterface() {
             <button onClick={reset}>Start again</button>
           </div>
         );
+      default:
+        return null;
     }
   };
 

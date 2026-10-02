@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { generateSecureRef } from '../utils/crypto';
 import { enqueue } from '../utils/storage';
 import { canAct } from '../utils/actions';
-import { getRate } from '../utils/currencies';
+import { getQuote } from '../utils/quote';
 
 const STAGES = ['SENT', 'IN_TRANSIT', 'READY_TO_COLLECT', 'COLLECTED'];
 
@@ -19,21 +19,23 @@ export function useTransfer() {
   } = useApp();
   const [ref, setRef] = useState(null);
 
-  const createTransfer = ({ amount, country, recipient }) => {
-    const fee = amount <= 100 ? 2 : amount <= 500 ? 5 : 8;
-    const rate = getRate(sendCurrency, receiveCurrency);
-    const receiverGets = (amount - fee) * rate;
+  // Only call this when the sender has actually CONFIRMED.
+  // `quote` is the quote the sender was shown; if it is passed in we use it,
+  // so the transfer always matches what was on screen.
+  const createTransfer = ({ amount, country, recipient, senderName = 'Thandi M.', quote }) => {
+    const q = quote ?? getQuote(amount, sendCurrency, receiveCurrency);
 
     const newRef = generateSecureRef();
     const newTransfer = {
-      amount,
+      amount: q.amount,
       country,
       recipient,
-      fee,
-      rate,
-      receiverGets,
-      sendCurrency,
-      receiveCurrency,
+      senderName,
+      fee: q.fee,
+      rate: q.rate,
+      receiverGets: q.receiverGets,
+      sendCurrency: q.sendCurrency,
+      receiveCurrency: q.receiveCurrency,
       ref: newRef
     };
 
@@ -49,9 +51,12 @@ export function useTransfer() {
     return newTransfer;
   };
 
+  // Moves SENT → IN_TRANSIT → READY_TO_COLLECT and then STOPS.
+  // The last step (COLLECTED) can only happen through markCollected(),
+  // i.e. the receiver verifying and choosing cash or bank.
   const advanceStatus = () => {
     const idx = STAGES.indexOf(status);
-    if (idx >= 0 && idx < STAGES.length - 1) {
+    if (idx >= 0 && idx < STAGES.length - 2) {
       setStatus(STAGES[idx + 1]);
     }
   };

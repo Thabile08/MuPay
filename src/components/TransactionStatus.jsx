@@ -1,5 +1,6 @@
 import { useApp } from '../context/AppContext';
 import { useTransfer } from '../hooks/useTransfer';
+import { formatMoney } from '../utils/currencies';
 import ReceiverNotification from './ReceiverNotification';
 
 export default function TransactionStatus({ variant = 'ussd' }) {
@@ -19,9 +20,11 @@ export default function TransactionStatus({ variant = 'ussd' }) {
     <div className={`status-block ${variant}`}>
       <p><strong>{label}</strong></p>
       <p>Ref: {transfer.ref}</p>
-      <p>{t('receiverGets')}: R{transfer.receiverGets.toFixed(2)}</p>
+      <p>{t('receiverGets')}: {formatMoney(transfer.receiverGets, transfer.receiveCurrency)}</p>
 
-      {status !== 'COLLECTED' && (
+      {/* Demo shortcut only for the early stages. The final step is the
+          receiver's job (verify → choose cash/bank), never the sender's. */}
+      {(status === 'SENT' || status === 'IN_TRANSIT') && (
         <button onClick={advanceStatus}>{t('nextStep')}</button>
       )}
 

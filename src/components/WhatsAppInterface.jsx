@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useTransfer } from '../hooks/useTransfer';
+import { getQuote, quoteText } from '../utils/quote';
 import TransactionStatus from './TransactionStatus';
 
 const COUNTRIES = ['ZW', 'MW', 'ZM', 'MZ', 'KE'];
 const COUNTRY_NAMES = { ZW: 'Zimbabwe', MW: 'Malawi', ZM: 'Zambia', MZ: 'Mozambique', KE: 'Kenya' };
+const EMPTY_DRAFT = { amount: null, country: null, recipient: null, quote: null };
 
 export default function WhatsAppInterface() {
-  const { t, offline, queued } = useApp();
-  const { transfer, createTransfer } = useTransfer();
+  const { t, offline, sendCurrency, receiveCurrency } = useApp();
+  const { createTransfer } = useTransfer();
 
   const [messages, setMessages] = useState([{ from: 'bot', text: t('waWelcome') }]);
   const [input, setInput] = useState('');
   const [step, setStep] = useState('idle');
-  const [draft, setDraft] = useState({ amount: null, country: null, recipient: null });
+  const [draft, setDraft] = useState(EMPTY_DRAFT);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +23,12 @@ export default function WhatsAppInterface() {
   }, [messages]);
 
   const push = (from, text) => setMessages((m) => [...m, { from, text }]);
+
+  const startSend = () => {
+    setDraft(EMPTY_DRAFT);
+    setStep('amount');
+    push('bot', t('waAskAmount', { currency: sendCurrency }));
+  };
 
   const handleSend = (raw) => {
     const text = (raw ?? input).trim();
@@ -32,8 +40,7 @@ export default function WhatsAppInterface() {
 
     // Global commands
     if (lower === 'send' || lower.includes('send money') || lower.includes('tumira mari')) {
-      setStep('amount');
-      push('bot', t('waAskAmount'));
+      startSend();
       return;
     }
     if (lower.includes('status') || lower.includes('tarisa')) {
@@ -45,7 +52,7 @@ export default function WhatsAppInterface() {
     switch (step) {
       case 'amount': {
         const amt = Number(text.replace(/[^\d.]/g, ''));
-        if (!amt) return push('bot', t('waAskAmount'));
+        if (!amt) return push('bot', t('waAskAmount', { currency: sendCurrency }));
         setDraft((d) => ({ ...d, amount: amt }));
         setStep('country');
         push('bot', t('waAskCountry'));
@@ -67,45 +74,42 @@ export default function WhatsAppInterface() {
         break;
       }
       case 'recipient': {
-        const newDraft = { ...draft, recipient: text };
-        setDraft(newDraft);
-        // Create transfer first so we can show computed fee/rate
-        const created = createTransfer({
-          amount: newDraft.amount,
-          country: newDraft.country,
-          recipient: newDraft.recipient
-        });
+        // Only work out and SHOW the quote here. No transfer exists yet.
+        const quote = getQuote(draft.amount, sendCurrency, receiveCurrency);
+        setDraft((d) => ({ ...d, recipient: text, quote }));
         setStep('confirm');
-        push('bot', t('waConfirm', {
-          amount: created.amount,
-          fee: created.fee,
-          rate: created.rate,
-          receiverGets: created.receiverGets.toFixed(2)
-        }));
+        push('bot', t('waConfirm', quoteText(quote)));
         break;
       }
       case 'confirm': {
         if (lower === 'yes' || lower.includes('simbisa')) {
+          // The transfer is created ONLY now, from the quote the sender saw.
+          const created = createTransfer({
+            amount: draft.amount,
+            country: draft.country,
+            recipient: draft.recipient,
+            quote: draft.quote
+          });
+          setDraft(EMPTY_DRAFT);
           setStep('status');
-          push('bot', queued
-            ? t('offlineSaved')
-            : t('waSent', { ref: transfer?.ref ?? '' })
-          );
+          push('bot', offline ? t('offlineSaved') : t('waSent', { ref: created.ref }));
         } else if (lower === 'no' || lower.includes('kanzura')) {
+          // Nothing was created, so cancelling really cancels.
+          setDraft(EMPTY_DRAFT);
           setStep('idle');
           push('bot', t('waCancelled'));
         } else {
-          push('bot', t('waConfirm', {
-            amount: transfer?.amount,
-            fee: transfer?.fee,
-            rate: transfer?.rate,
-            receiverGets: transfer?.receiverGets?.toFixed(2)
-          }));
+          push('bot', t('waConfirm', quoteText(draft.quote)));
         }
         break;
       }
       default:
-        push('bot', t('waWelcome'));
+        // The welcome message tells people to reply 1 or 2, so honour that.
+        if (text === '1') startSend();
+        else if (text === '2') {
+          setStep('status');
+          push('bot', t('inTransit'));
+        } else push('bot', t('waWelcome'));
     }
   };
 
