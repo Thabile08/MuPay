@@ -787,3 +787,28 @@ button.secondary { background: #666; }
   margin-top: 4px;
   letter-spacing: 0.02em;
 }
+.side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-top: 16px;
+}
+@media (max-width: 720px) {
+  .side-by-side { grid-template-columns: 1fr; }
+}
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.panel-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #555;
+  text-align: center;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
